@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "project": {
+    "name": "temp-app",
+    "productType": null,
+    "stack": [
+      "react",
+      "tailwind-v3",
+      "vite"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/index.css"
+    ],
+    "components": [
+      "src/components/ui"
+    ],
+    "assets": [
+      "src/assets"
+    ],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "light",
+    "colors": {
+      "--paper-muted": {
+        "value": "#E5E1DA",
+        "source": "src/index.css"
+      },
+      "--text-primary": {
+        "value": "#111111",
+        "source": "src/index.css"
+      },
+      "--text-muted": {
+        "value": "#77736D",
+        "source": "src/index.css"
+      }
+    },
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [
+    {
+      "decision": "Premium editorial dark studio system with restrained paper sections",
+      "reason": "Positions Campus Growth Studio as a credible boutique partner for emerging businesses without using generic SaaS patterns."
+    },
+    {
+      "decision": "Keep the local deterministic ASCII canvas as the hero signature",
+      "reason": "Preserves the existing identity while avoiding third-party embed overhead and attribution constraints."
+    },
+    {
+      "decision": "Use honest concept work and a business-type switcher instead of fabricated social proof",
+      "reason": "Supports conversion and relevance without inventing clients, outcomes or testimonials."
+    }
+  ],
+  "evidence": [
+    {
+      "fact": "components.installed",
+      "source": "src/components/ui"
+    },
+    {
+      "fact": "design.colorMode:light",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:tailwind-v3",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:vite",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-10-17T20:13:36.479Z"
+}

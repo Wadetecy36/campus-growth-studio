@@ -41,6 +41,7 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
     let currentRotX = 0.3;
     let currentRotY = 0.4;
     let time = 0;
+    let lastFrameTimestamp = 0;
 
     // Characters sorted by visual density
     const GLYPHS = " ·:-=+*#%@";
@@ -84,7 +85,9 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
 
-      ctx.scale(dpr, dpr);
+      // Reset the transform before applying the current device scale. Without
+      // this, every ResizeObserver callback compounds the previous scale.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     const resizeObserver = new ResizeObserver(() => {
@@ -102,6 +105,7 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
         isVisible = entry.isIntersecting;
         if (isVisible && !motionMediaQuery.matches) {
           lastTimestamp = performance.now();
+          cancelAnimationFrame(animationFrameId);
           animationFrameId = requestAnimationFrame(loop);
         } else {
           cancelAnimationFrame(animationFrameId);
@@ -113,6 +117,7 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
 
     // Pointer move listener
     const handlePointerMove = (e: MouseEvent) => {
+      if (motionMediaQuery.matches) return;
       if (!container) return;
       const rect = container.getBoundingClientRect();
       const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -230,7 +235,7 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
       ctx.font = '8px "JetBrains Mono", monospace';
       ctx.textAlign = "left";
       ctx.fillText(
-        `GEN_SURFACE // PTS: ${points.length} // LAT: ${Math.round(currentRotX * 100)}° LON: ${Math.round(currentRotY * 100)}°`,
+        `GEN_SURFACE // PTS: ${points.length}`,
         16,
         height - 16
       );
@@ -238,6 +243,11 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
 
     const loop = (timestamp: number) => {
       if (!isVisible || motionMediaQuery.matches) return;
+      if (timestamp - lastFrameTimestamp < 32) {
+        animationFrameId = requestAnimationFrame(loop);
+        return;
+      }
+      lastFrameTimestamp = timestamp;
       const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
       lastTimestamp = timestamp;
       time += dt;
@@ -245,6 +255,20 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
       renderFrame(dt);
       animationFrameId = requestAnimationFrame(loop);
     };
+
+    const handleMotionPreferenceChange = (event: MediaQueryListEvent) => {
+      setIsReducedMotion(event.matches);
+      cancelAnimationFrame(animationFrameId);
+      if (event.matches) {
+        renderFrame(0);
+      } else if (isVisible) {
+        lastTimestamp = performance.now();
+        animationFrameId = requestAnimationFrame(loop);
+      }
+    };
+
+    motionMediaQuery.removeEventListener("change", handleMotionChange);
+    motionMediaQuery.addEventListener("change", handleMotionPreferenceChange);
 
     // Initial render
     resize();
@@ -259,7 +283,7 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       container.removeEventListener("mousemove", handlePointerMove);
-      motionMediaQuery.removeEventListener("change", handleMotionChange);
+      motionMediaQuery.removeEventListener("change", handleMotionPreferenceChange);
     };
   }, []);
 
@@ -277,7 +301,7 @@ export function HeroAsciiVisual({ className }: HeroAsciiVisualProps) {
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-full min-h-[380px] lg:min-h-[520px] flex items-center justify-center overflow-hidden select-none ${className}`}
+      className={`relative w-full h-full min-h-[280px] sm:min-h-[380px] lg:min-h-[520px] flex items-center justify-center overflow-hidden select-none ${className}`}
       aria-hidden="true"
     >
       {/* Background micro grid */}
